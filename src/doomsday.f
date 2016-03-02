@@ -1,11 +1,12 @@
       program doomsday
       integer d,m,y
-      integer c,w
-      integer a,r
+      integer c,w, r
+      integer leap
+      integer a(0:3)
+      data a /2, 0, 5, 3/
 
 c     demonstration of doomsday algo for determining day of week
 c     http://www.timeanddate.com/date/doomsday-weekday.html
-
 
 c     yeah, it's obfuscating
 
@@ -33,31 +34,57 @@ c     yeah, it's obfuscating
          stop
       endif
 
-c     should check the day based on current month and leap/noleap year
+c     is the year a leap year?
 
+      leap = 0
+      if (mod(y, 4) .EQ. 0) then
+         if (mod(y, 100) .NE. 0) then
+            leap = 1
+         endif
+      elseif (mod(y, 400) .EQ. 0) then
+         leap = 1
+      endif
+
+c     check the day based on current month and leap/noleap year
+
+c     first is the most common case
       if (d .GT. 31) then
          write (*,*) "...but the day ", d, " is greater than 31"
          stop
       endif
 
-c     century -1
-      c = mod(y/100, 4)
-
-c     an anchor day for that century
-      if (c .EQ. 0) then
-         a = 2
-      elseif (c .EQ. 1) then
-         a = 0
-      elseif (c .EQ. 2) then
-         a = 5
-      elseif (c .EQ. 3) then
-         a = 3
+c     february exception from the rule
+      if (m .EQ. 2) then
+         if (d .GT. 28 + leap) then
+            write (*,20)
+     &           "...but in february of that year we have only",
+     &           28 + leap, " days"
+ 20         format (A, I3, A)
+            stop
+         endif
       endif
 
-      write (*,*) "Anchor day is ", a
+c     if greater than 30 and the month is one of 4 with 30 days
+      if (d .GT. 30) then
+         if (m .EQ. 4) then
+            write (*,*) "...but april has only 30 days"
+            stop
+         elseif (m .EQ. 6) then
+            write (*,*) "...but the june has only 30 days"
+            stop
+         elseif (m .EQ. 9) then
+            write (*,*) "...but the september has only 30 days"
+            stop
+         elseif (m .EQ. 11) then
+            write (*,*) "...but the november has only 30 days"
+            stop
+         endif
+      endif
+
+c     now we have correct date in integers d/m/y
 
 c     last two digits of the year
-      c = y - y /100 *100
+      c = mod(y, 100)
 
       write (*,*) "Last two digits is ", c
 
@@ -72,7 +99,7 @@ c     remainder of integer division
       write (*,*) "Remainder? ", mod(c, 12)
 
 c     sum division, remainder, division of remainder by 4, anchor
-      w = w + r + r/4 + a
+      w = w + r + r/4 + a(mod(y/100, 4))
 
       write (*,*) "The sum is ", w
 
