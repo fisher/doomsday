@@ -1,14 +1,11 @@
       program doomsday
-      integer d,m,y
-      integer c,w, r
-      integer leap
+      integer d, m, y
+      integer w, leap
       integer a(0:3)
       data a /2, 0, 5, 3/
 
 c     demonstration of doomsday algo for determining day of week
 c     http://www.timeanddate.com/date/doomsday-weekday.html
-
-c     yeah, it's obfuscating
 
       write (*,*) "Enter date (dd/mm/yyyy):"
       read (*,'(I2,X,I2,X,I4)') d,m,y
@@ -84,28 +81,16 @@ c     if greater than 30 and the month is one of 4 with 30 days
 c     now we have correct date in integers d/m/y
 
 c     last two digits of the year
-      c = mod(y, 100)
+      w = mod(y, 100)
 
-      write (*,*) "Last two digits is ", c
+c     sum division, remainder, division of remainder by 4, and anchor
+      w = w/12 + mod(w,12) + mod(w,12)/4 + a(mod(y/100, 4))
 
-c     how many times does the number 12 fit into the 2 last digits
-      w = c / 12
-
-      write (*,*) "How many times does the number 12 fit? ", w
-
-c     remainder of integer division
-      r = mod(c, 12)
-
-      write (*,*) "Remainder? ", mod(c, 12)
-
-c     sum division, remainder, division of remainder by 4, anchor
-      w = w + r + r/4 + a(mod(y/100, 4))
-
-      write (*,*) "The sum is ", w
-
+c     modulo 7 to get the day number
       w = mod(w, 7)
 
-      write (*,*) "Doomsday for the year is ", w
+c     it's a kind of magic!
+      write (*,'(A, I2)') "Doomsday for the year is", w
 
 *     I don't get it. Why does it work?
 
